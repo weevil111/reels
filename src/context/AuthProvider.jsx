@@ -15,8 +15,8 @@ export function AuthProvider({ children }) {
     return firebaseAuth.signOut();
   }
 
-  function signUp(){
-    //
+  function signUp(email, password){
+    return firebaseAuth.createUserWithEmailAndPassword(email, password);
   }
 
   useEffect(() => {
