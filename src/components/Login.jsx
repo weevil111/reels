@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-const Login = () => {
+const Login = (props) => {
   return ( <h1>Login</h1> );
 }
  
