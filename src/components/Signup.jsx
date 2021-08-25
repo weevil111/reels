@@ -18,7 +18,7 @@ const Signup = (props) => {
     try {
       let response = await signUp(email, password);
       let uid = response.user.uid;
-      const uploadPhotoObject = firebaseStorage.ref(`/profilePhotos/${uid}/image.jpg`).put(profileImage);
+      const uploadPhotoObject = firebaseStorage.ref(`/media/${uid}/profile/profilePhoto.jpg`).put(profileImage);
       uploadPhotoObject.on("state_changed", fun1, fun2, fun3);
       // to track the progess of the upload
       function fun1(snapshot){
@@ -39,7 +39,8 @@ const Signup = (props) => {
           email,
           userId: uid,
           username,
-          profileImageUrl
+          profileImageUrl,
+          postsCreated: []
         });
         props.history.push("/");
       }
@@ -56,7 +57,7 @@ const Signup = (props) => {
           <input
             type="text"
             value={username}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div>
