@@ -1,4 +1,6 @@
+import { Container, Grid, Paper, Card, CardMedia, CardContent, TextField, CardActions, Button, Typography, makeStyles } from '@material-ui/core';
 import React, { useContext, useState } from 'react'
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthProvider';
 const Login = (props) => {
   const [email, setEmail] = useState("apm@apm.com");
@@ -15,29 +17,90 @@ const Login = (props) => {
       setPassword("");
     }
   }
-  return (<>
-  <h1>Login page</h1>
-    <div>
-      <div>
-        Email
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <div>
-        Password
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-    </div>
-    <button onClick={handleLogin}>Login</button>
-    <h2 style={{color: "red"}}> {message}</h2>
-  </>);
+  let useStyles = makeStyles({
+    cardContent: {
+      display: "flex",
+      flexDirection: "column",
+      marginBottom: "1rem"
+    },
+    carousal: {
+      height: "10rem",
+      backgroundColor: "lightgray"
+    },
+    fullWidth:{
+      width: "100%"
+    }, 
+    centerElements: {
+      display: "flex",
+      flexDirection: "column",
+    },
+    mb: {
+      marginBottom: "1rem"
+    },
+    pd: {
+      padding:"1rem"
+    },
+    alignCenter: {
+      justifyContent: "center"
+    },
+    textCenter: {
+      textAlign: "center"
+    }
+  })
+
+  let classes = useStyles();
+
+  return (
+  <Container >
+    <Grid container spacing={2} justifyContent="center" >
+      <Grid item sm={5}>
+        <Paper className={classes.carousal}>Carousel</Paper>
+      </Grid>
+      <Grid item sm={5} >
+        <Card variant="outlined">
+          <CardMedia image="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/840px-Instagram_logo.svg.png" style={{height:"5rem", backgroundSize:"contain"}}>
+          </CardMedia>
+          <CardContent className={classes.cardContent}>
+            <TextField
+              label="Email"
+              type="email"
+              variant="outlined"
+              value={email}
+              size="small"
+              onChange={(e) => setEmail(e.target.value)}
+              className={classes.mb}
+            ></TextField>
+            <TextField
+              label="Password"
+              type="password"
+              variant="outlined"
+              value={password}
+              size="small"
+              onChange={(e) => setPassword(e.target.value)}
+            ></TextField>
+            <Typography style={{color: "red"}}>{message}</Typography>
+          </CardContent>
+          <CardActions>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={handleLogin}
+              className={classes.fullWidth}
+              >Login</Button>
+          </CardActions>
+        </Card>
+        <Card variant="outlined" className={classes.pd}>
+          <Typography className={classes.textCenter}>
+            Don't have an account ?
+            <Button variant="text" color="primary">
+              <Link to="/signup">Signup</Link>
+            </Button>
+          </Typography>
+        </Card>
+      </Grid>
+    </Grid>
+  </Container>
+);
 }
 
 export default Login;
