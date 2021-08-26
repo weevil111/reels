@@ -163,43 +163,6 @@ const Signup = (props) => {
         </Card>
         </Grid>
       </Grid>
-      {/* <h1>Signup page</h1>
-        <div>
-          <div>
-            Username
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div>
-            Email
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            Password
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div>
-            Profile Image
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileSubmit(e)}
-            />
-          </div>
-        </div>
-        <button onClick={handleSignUp}>SignUp</button>
-        <h2 style={{color: "red"}}> {message}</h2> */}
     </Container>
   );
 }
