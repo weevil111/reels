@@ -13,5 +13,6 @@ let firebaseApp = firebase.initializeApp(firebaseConfig);
 let firebaseAuth = firebaseApp.auth();
 let firebaseStorage = firebaseApp.storage();
 let firebaseDB = firebaseApp.firestore();
+let timestamp = firebase.firestore.FieldValue.serverTimestamp;
 
-export {firebaseAuth, firebaseStorage, firebaseDB};
+export {firebaseAuth, firebaseStorage, firebaseDB, timestamp};

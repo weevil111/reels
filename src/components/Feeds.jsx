@@ -3,12 +3,13 @@ import { PhotoCamera } from '@material-ui/icons';
 import React, { useContext, useEffect } from 'react'
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { firebaseDB, firebaseStorage } from '../config/firebase';
+import { firebaseDB, firebaseStorage, timestamp } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider'
 import VideoPost from './Post';
 const Feeds = (props) => {
   const { signOut, currentUser } = useContext(AuthContext);
   const [videoFile, setVideoFile] = useState(null);
+  const [errMessage, setErrMessage] = useState("");
   const [fileLocalPath, setfileLocalPath] = useState("");
   const [posts, setPosts] = useState([]);
 
@@ -22,6 +23,13 @@ const Feeds = (props) => {
   }
   const handleInputFile = (e) => {
     let file = e.target.files[0];
+    if(!file){
+      return;
+    } else if((file.size/1024/1024) > 25){
+      setErrMessage("File too large ( > 25 MB)");
+      // return;
+    }
+    setErrMessage("");
     setfileLocalPath(e.target.value);
     setVideoFile(file);
   }
@@ -59,7 +67,8 @@ const Feeds = (props) => {
           likes: [],
           mediaLink: videoUrl,
           caption: "First video",
-          type: "video"
+          type: "video",
+          createdAt: timestamp()
         });
         let doc = await firebaseDB.collection("users").doc(uid).get();
         let oldDocument = doc.data();
@@ -103,17 +112,18 @@ const Feeds = (props) => {
   }, [posts])
 
   useEffect(() => {
-    firebaseDB.collection("posts").get()
-      .then(snapshot => {
-        let allPosts = snapshot.docs.map(doc => {
-          return doc.data();
-        });
-        setPosts(allPosts);
-      })
+    firebaseDB.collection("posts")
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+      let allPosts = snapshot.docs.map(doc => {
+        return doc.data();
+      });
+      setPosts(allPosts);
+    })
   }, [])
 
   return (<div>
-    {/* <button onClick={handleLogout}>Logout</button> */}
+    <button onClick={handleLogout}>Logout</button>
     <div className="uploadVideo">
       <div>
         <input
@@ -130,6 +140,7 @@ const Feeds = (props) => {
           >Upload</Button>
         </label>
       </div>
+      <p style={{color:"red"}}>{errMessage}</p>
     </div>
     <div className="feeds-video-list">
       {posts.map(post => (

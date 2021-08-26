@@ -1,5 +1,7 @@
-import { Avatar, Button, Card, CardContent, CardMedia, TextField, Typography } from '@material-ui/core';
-import React, {useEffect, useState, useContext} from 'react'
+import { Avatar, Button, Card, CardContent, CardMedia, IconButton, TextField, Typography } from '@material-ui/core';
+import { Favorite, FavoriteBorder } from '@material-ui/icons';
+import React, { useEffect, useState, useContext } from 'react'
+import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { firebaseDB } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider';
@@ -9,7 +11,10 @@ const Post = (props) => {
   let [user, setUser] = useState({});
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
-  const {currentUser} = useContext(AuthContext);
+
+  const [likesCount, setLikesCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const { currentUser } = useContext(AuthContext);
 
   const handleComment = async () => {
     let doc = await firebaseDB.collection("posts").doc(pid).get();
@@ -24,6 +29,7 @@ const Post = (props) => {
     setCommentList(oldCommentList => {
       return currentCommentData.concat(oldCommentList);
     })
+    setComment("");
   }
 
   const fetchCommentUserDetails = async (comments) => {
@@ -42,16 +48,40 @@ const Post = (props) => {
     return commentList;
   }
 
-  useEffect(async () => {
-    try {
-      let doc = await firebaseDB.collection("users").doc(uid).get();
-      let user = doc.data();
-      setUser(user);
-      let updatedCommentList = await fetchCommentUserDetails(props.post.comments);
-      setCommentList(updatedCommentList);
-    } catch (err) {
-      console.log(err);
+  const toggleLikeIcon = async (e) => {
+    let postDoc = props.post;
+    if (isLiked) {
+      let filteredLikes = postDoc.likes.filter(el => el !== currentUser.uid);
+      postDoc.likes = filteredLikes;
+      await firebaseDB.collection("posts").doc(pid).set(postDoc);
+      setIsLiked(false);
+    } else {
+      postDoc.likes.push(currentUser.uid);
+      await firebaseDB.collection("posts").doc(pid).set(postDoc);
+      setIsLiked(true);
     }
+  }
+
+  useEffect(() => {
+    (async function anonymousFunc() {
+      try {
+        let doc = await firebaseDB.collection("users").doc(uid).get();
+        let user = doc.data();
+        setUser(user);
+        let updatedCommentList = await fetchCommentUserDetails(props.post.comments);
+        setCommentList(updatedCommentList);
+        let likes = props.post.likes;
+        let isLiked = likes.includes(currentUser.uid);
+        setIsLiked(isLiked);
+        if (isLiked) {
+          setLikesCount(likes.length - 1);
+        } else {
+          setLikesCount(likes.length);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })()
   }, [])
   return (
     <Card>
@@ -63,6 +93,19 @@ const Post = (props) => {
             <Video src={props.post.mediaLink}></Video>
           </div>
         </CardMedia>
+        <IconButton>
+          {isLiked ?
+            (<Favorite
+              style={{ color: "red" }}
+              onClick={toggleLikeIcon}
+            ></Favorite>)
+            :
+            (<FavoriteBorder onClick={toggleLikeIcon}></FavoriteBorder>)}
+        </IconButton>
+        {(likesCount > 0) &&
+          <div><Typography variant="body1">
+            {isLiked? `You and ${likesCount} other(s) liked it.`: `${likesCount} people liked it.`}
+          </Typography></div>}
         <Typography variant="body1">Comments</Typography>
         <TextField
           variant="outlined"
@@ -81,13 +124,22 @@ const Post = (props) => {
 }
 
 function Video(props) {
+
+  const handleAutoScroll = (e) => {
+    let next = ReactDOM.findDOMNode(e.target).parentNode.parentNode.parentNode.parentNode.nextSibling
+    if (next) {
+      next.scrollIntoView({ behaviour: "smooth" });
+      e.target.muted = "true";
+    }
+  }
+
   return (
     <video
       className="video-styles"
       muted={true}
-      loop={true}
       controls
       style={{ height: "80vh", border: "1px solid whitesmoke" }}
+      onEnded={handleAutoScroll}
     >
       <source src={props.src} type="video/mp4" />
     </video>

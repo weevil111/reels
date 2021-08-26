@@ -9,7 +9,7 @@ const Login = (props) => {
   const {login} = useContext(AuthContext);
   const handleLogin = async (e) => {
     try{
-      let response = await login(email, password);
+      await login(email, password);
       props.history.push("/")
     }catch(err){
       setMessage(err.message);

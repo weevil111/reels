@@ -8,16 +8,23 @@ import Signup from './components/Signup';
 import { AuthContext, AuthProvider } from './context/AuthProvider';
 
 function App() {
+  let {currentUser} = useContext(AuthContext);
   return (
     <AuthProvider>
       <Router>
         <div className="App">
           <Header></Header>
           <Switch>
-            <Route path="/login" component={Login} exact></Route>
-            <Route path="/signup" component={Signup} exact></Route>
-            <PrivateRoute path="/" comp={Feeds}></PrivateRoute>
-            <PrivateRoute path="/profile" comp={Profile}></PrivateRoute>
+            {currentUser? (<>
+              <Route path="/" component={Feeds} exact></Route>
+              <Route path="/profile" component={Profile}></Route>
+              <Redirect to="/"></Redirect>
+            </>) : (<>
+              <Route path="/login" component={Login} exact></Route>
+              <Route path="/signup" component={Signup} exact></Route>
+              <Redirect to="/login"></Redirect>
+            </>)
+            }
           </Switch>
         </div>
       </Router>
@@ -25,14 +32,14 @@ function App() {
   );
 }
 
-function PrivateRoute(props){
-  let {comp: component, path} = props;
-  let {currentUser} = useContext(AuthContext);
-  return currentUser? (
-    <Route path={path} component={component}></Route>
-  ): (
-    <Redirect to="/login"></Redirect>
-  )
-}
+// function PrivateRoute(props) {
+//   let { comp: component, path } = props;
+//   let { currentUser } = useContext(AuthContext);
+//   return currentUser ? (
+//     <Route path={path} component={component}></Route>
+//   ) : (
+//     <Redirect to="/login"></Redirect>
+//   )
+// }
 
 export default App;
