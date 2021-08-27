@@ -1,11 +1,11 @@
-import { Button } from '@material-ui/core';
+import { Button, makeStyles } from '@material-ui/core';
 import { PhotoCamera } from '@material-ui/icons';
 import React, { useContext, useEffect } from 'react'
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { firebaseDB, firebaseStorage, timestamp } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider'
-import VideoPost from './Post';
+import Post from './Post';
 const Feeds = (props) => {
   const { currentUser } = useContext(AuthContext);
   const [videoFile, setVideoFile] = useState(null);
@@ -20,7 +20,7 @@ const Feeds = (props) => {
       return;
     } else if ((file.size / 1024 / 1024) > 25) {
       setErrMessage("File too large ( > 25 MB)");
-      // return;
+      return;
     }
     setErrMessage("");
     setfileLocalPath(e.target.value);
@@ -80,7 +80,7 @@ const Feeds = (props) => {
   useEffect(() => {
     let conditionObject = {
       root: null, // Observer from the whole page
-      threshold: "0.8"
+      threshold: "0.6"
     }
     function observerCallback(entries) {
       entries.forEach(entry => {
@@ -114,8 +114,19 @@ const Feeds = (props) => {
       })
   }, [])
 
-  return (<div>
-    <div className="uploadVideo">
+  const useStyles = makeStyles({
+    postList: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center"
+    }
+  })
+
+  const classes = useStyles();
+
+  return (<>
+    {/* <div className="uploadVideo">
       <div>
         <input
           type="file"
@@ -132,13 +143,13 @@ const Feeds = (props) => {
         </label>
       </div>
       <p style={{ color: "red" }}>{errMessage}</p>
-    </div>
-    <div className="feeds-video-list">
+    </div> */}
+    <div className={classes.postList}>
       {posts.map(post => (
-        <VideoPost key={post.pid} post={post}></VideoPost>
+        <Post key={post.pid} post={post}></Post>
       ))}
     </div>
-  </div>);
+  </>);
 }
 
 export default Feeds;

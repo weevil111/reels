@@ -1,4 +1,4 @@
-import { Avatar, Button, Grid, makeStyles, Menu, MenuItem, Typography } from '@material-ui/core'
+import { Avatar, Button, Grid, makeStyles, Menu, MenuItem } from '@material-ui/core'
 import { AccountCircle, ExitToApp, ExploreOutlined, HomeOutlined, Input, PermIdentity, VpnKey } from '@material-ui/icons'
 import React, { useState } from 'react'
 import { useContext } from 'react'
@@ -23,7 +23,7 @@ const Header = () => {
     img: {
       margin: "auto",
       display: "block",
-      width: "80%",
+      width: "150px",
       height: "100%",
     },
     menuOptions: {
@@ -33,8 +33,11 @@ const Header = () => {
     },
     outerContainer: {
       padding: "10px 10vw 0 10vw",
-      borderBottom: "1px solid whitesmoke"
-
+      borderBottom: "1px solid whitesmoke",
+      position: "sticky",
+      top: "0",
+      background: "white",
+      zIndex: "999"
     }
   })
   const navigate = (path) => {

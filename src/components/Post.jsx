@@ -1,13 +1,13 @@
-import { Avatar, Button, Card, CardContent, CardMedia, IconButton, TextField, Typography } from '@material-ui/core';
-import { Favorite, FavoriteBorder } from '@material-ui/icons';
+import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Grid, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Favorite, FavoriteBorder, ModeCommentOutlined, MoreVert, ShareOutlined } from '@material-ui/icons';
 import React, { useEffect, useState, useContext } from 'react'
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { firebaseDB } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider';
 
-const Post = (props) => {
-  const { uid, pid } = props.post;
+const Post = ({ post }) => {
+  const { uid, pid } = post;
   let [user, setUser] = useState({});
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
@@ -23,7 +23,7 @@ const Post = (props) => {
       uid: currentUser.uid,
       comment
     };
-    oldDocument.comments = [...oldDocument.comments, commentObject];
+    oldDocument.comments = [commentObject, ...oldDocument.comments];
     await firebaseDB.collection("posts").doc(pid).set(oldDocument);
     let currentCommentData = await fetchCommentUserDetails([commentObject]);
     setCommentList(oldCommentList => {
@@ -49,7 +49,7 @@ const Post = (props) => {
   }
 
   const toggleLikeIcon = async (e) => {
-    let postDoc = props.post;
+    let postDoc = post;
     if (isLiked) {
       let filteredLikes = postDoc.likes.filter(el => el !== currentUser.uid);
       postDoc.likes = filteredLikes;
@@ -68,9 +68,9 @@ const Post = (props) => {
         let doc = await firebaseDB.collection("users").doc(uid).get();
         let user = doc.data();
         setUser(user);
-        let updatedCommentList = await fetchCommentUserDetails(props.post.comments);
+        let updatedCommentList = await fetchCommentUserDetails(post.comments);
         setCommentList(updatedCommentList);
-        let likes = props.post.likes;
+        let likes = post.likes;
         let isLiked = likes.includes(currentUser.uid);
         setIsLiked(isLiked);
         if (isLiked) {
@@ -83,43 +83,121 @@ const Post = (props) => {
       }
     })()
   }, [])
-  return (
-    <Card>
-      <CardContent>
-        <Avatar src={user.profileImageUrl}></Avatar>
-        <Typography variant="h3">{user.username}</Typography>
-        <CardMedia>
-          <div className="video-container">
-            <Video src={props.post.mediaLink}></Video>
-          </div>
-        </CardMedia>
-        <IconButton onClick={toggleLikeIcon}>
-          {isLiked ?
-            (<Favorite
-              style={{ color: "red" }}
-            ></Favorite>)
-            :
-            (<FavoriteBorder></FavoriteBorder>)}
-        </IconButton>
-        {(likesCount > 0) &&
-          <div><Typography variant="body1">
-            {isLiked? `You and ${likesCount} other(s) liked it.`: `${likesCount} people liked it.`}
-          </Typography></div>}
-        <Typography variant="body1">Comments</Typography>
-        <TextField
-          variant="outlined"
-          placeholder="Add a comment"
-          size="small"
-          value={comment}
-          onChange={e => setComment(e.target.value)}
-        ></TextField>
-        <Button variant="contained" color="secondary" onClick={handleComment}>Post</Button>
-        {commentList.map(commentObj => (<div key={commentObj.id}>
-          <Avatar src={commentObj.profilePic}></Avatar>
-          <Typography variant="body1">{commentObj.comment}</Typography>
-        </div>))}
-      </CardContent>
-    </Card>);
+
+  const useStyles = makeStyles({
+    container: {
+      margin: "24px 0"
+    },
+    cardIconsContainer: {
+      display: "flex",
+      justifyContent: "flex-start",
+      width: "100%",
+      padding: "0 5px"
+    },
+    cardActions: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start"
+    },
+    comments: {
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      textOverflow: "ellipsis"
+    },
+    userComment: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%"
+    },
+    modalLinkText:{ 
+      color: "rgba(0,0,0,0.5)", 
+      textDecoration: "underline",
+      paddingBottom: "8px",
+      cursor: "pointer"
+     }
+  });
+  const classes = useStyles();
+  const postDate = new Date(post.createdAt.toMillis());
+  const postTimeFormatted = `${postDate.toDateString()} - ${postDate.toLocaleTimeString()}`;
+  return user ? (
+    <Grid container justifyContent="center" className={classes.container}>
+      <Grid item xs={12} sm={8} lg={4} zeroMinWidth>
+        <Card>
+          <CardHeader
+            avatar={
+              <Avatar src={user.profileImageUrl}></Avatar>
+            }
+            action={
+              <IconButton aria-label="settings">
+                <MoreVert />
+              </IconButton>
+            }
+            title={user.username ? user.username : user.email}
+            subheader={postTimeFormatted}
+          />
+          <CardContent>
+            <CardMedia>
+              <div className="video-container">
+                <Video src={post.mediaLink}></Video>
+              </div>
+            </CardMedia>
+          </CardContent>
+          <CardActions className={classes.cardActions}>
+            <div className={classes.cardIconsContainer}>
+              <IconButton onClick={toggleLikeIcon} size="small">
+                {isLiked ?
+                  (<Favorite
+                    color="secondary"
+                    fontSize="large"
+                  ></Favorite>)
+                  :
+                  (<FavoriteBorder fontSize="large"></FavoriteBorder>)}
+              </IconButton>
+              <IconButton size="small">
+                <ModeCommentOutlined fontSize="large"></ModeCommentOutlined>
+              </IconButton>
+              <IconButton size="small">
+                <ShareOutlined fontSize="large"></ShareOutlined>
+              </IconButton>
+            </div>
+            {(likesCount > 0) &&
+              <div><Typography variant="body1">
+                {isLiked ? `You and ${likesCount} other(s) liked it.` : `${likesCount} people liked it.`}
+              </Typography></div>}
+            {commentList.length > 0 ? (
+              <ListItem key={commentList[0].id} disableGutters >
+                <ListItemIcon>
+                  <Avatar src={commentList[0].profilePic}></Avatar>
+                </ListItemIcon>
+                <ListItemText
+                  primary={<Typography className={classes.comments}>{commentList[0].username}</Typography>}
+                  secondary={<Typography className={classes.comments} style={{ color: "rgba(0,0,0,0.5)" }}>{commentList[0].comment}</Typography>}
+                  disableTypography
+                />
+              </ListItem>) : null}
+            <Typography className={classes.modalLinkText}>View all commments</Typography>
+            <div className={classes.userComment}>
+              <TextField
+                variant="outlined"
+                placeholder="Add a comment"
+                size="small"
+                value={comment}
+                onChange={e => setComment(e.target.value)}
+                style={{ flexGrow: 1 }}
+              ></TextField>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                onClick={handleComment}
+                style={{ margin: "0 24px 8px 24px" }}
+              >Post</Button>
+            </div>
+          </CardActions>
+        </Card>
+      </Grid>
+    </Grid>) : (<Typography variant="h3">No posts found</Typography>);
 }
 
 function Video(props) {
@@ -137,7 +215,7 @@ function Video(props) {
       className="video-styles"
       muted={true}
       controls
-      style={{ height: "80vh", border: "1px solid whitesmoke" }}
+      style={{ width: "100%", border: "1px solid whitesmoke" }}
       onEnded={handleAutoScroll}
     >
       <source src={props.src} type="video/mp4" />
