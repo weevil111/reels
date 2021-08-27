@@ -7,25 +7,18 @@ import { firebaseDB, firebaseStorage, timestamp } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider'
 import VideoPost from './Post';
 const Feeds = (props) => {
-  const { signOut, currentUser } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
   const [videoFile, setVideoFile] = useState(null);
   const [errMessage, setErrMessage] = useState("");
   const [fileLocalPath, setfileLocalPath] = useState("");
   const [posts, setPosts] = useState([]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      props.history.push("/login")
-    } catch (err) {
-      console.log(err);
-    }
-  }
+
   const handleInputFile = (e) => {
     let file = e.target.files[0];
-    if(!file){
+    if (!file) {
       return;
-    } else if((file.size/1024/1024) > 25){
+    } else if ((file.size / 1024 / 1024) > 25) {
       setErrMessage("File too large ( > 25 MB)");
       // return;
     }
@@ -82,26 +75,25 @@ const Feeds = (props) => {
       console.log(err);
     }
   }
-  let conditionObject = {
-    root: null, // Observer from the whole page
-    threshold: "0.8"
-  }
 
-  function observerCallback(entries) {
-    console.log(entries);
-    entries.forEach(entry => {
-      let child = entry.target.children[0];
-      // play() => async
-      // pause() => sync
-      child.play().then(function () {
-        if (entry.isIntersecting === false) {
-          child.pause();
-        }
-      })
-    })
-  }
 
   useEffect(() => {
+    let conditionObject = {
+      root: null, // Observer from the whole page
+      threshold: "0.8"
+    }
+    function observerCallback(entries) {
+      entries.forEach(entry => {
+        let child = entry.target.children[0];
+        // play() => async
+        // pause() => sync
+        child.play().then(function () {
+          if (entry.isIntersecting === false) {
+            child.pause();
+          }
+        })
+      })
+    }
     let observerObject = new IntersectionObserver(observerCallback, conditionObject);
     let elements = document.querySelectorAll(".video-container");
 
@@ -113,17 +105,16 @@ const Feeds = (props) => {
 
   useEffect(() => {
     firebaseDB.collection("posts")
-    .orderBy("createdAt", "desc")
-    .onSnapshot(snapshot => {
-      let allPosts = snapshot.docs.map(doc => {
-        return doc.data();
-      });
-      setPosts(allPosts);
-    })
+      .orderBy("createdAt", "desc")
+      .onSnapshot(snapshot => {
+        let allPosts = snapshot.docs.map(doc => {
+          return doc.data();
+        });
+        setPosts(allPosts);
+      })
   }, [])
 
   return (<div>
-    <button onClick={handleLogout}>Logout</button>
     <div className="uploadVideo">
       <div>
         <input
@@ -140,7 +131,7 @@ const Feeds = (props) => {
           >Upload</Button>
         </label>
       </div>
-      <p style={{color:"red"}}>{errMessage}</p>
+      <p style={{ color: "red" }}>{errMessage}</p>
     </div>
     <div className="feeds-video-list">
       {posts.map(post => (

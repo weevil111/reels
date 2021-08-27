@@ -93,14 +93,13 @@ const Post = (props) => {
             <Video src={props.post.mediaLink}></Video>
           </div>
         </CardMedia>
-        <IconButton>
+        <IconButton onClick={toggleLikeIcon}>
           {isLiked ?
             (<Favorite
               style={{ color: "red" }}
-              onClick={toggleLikeIcon}
             ></Favorite>)
             :
-            (<FavoriteBorder onClick={toggleLikeIcon}></FavoriteBorder>)}
+            (<FavoriteBorder></FavoriteBorder>)}
         </IconButton>
         {(likesCount > 0) &&
           <div><Typography variant="body1">
