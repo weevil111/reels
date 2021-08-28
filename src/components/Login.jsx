@@ -5,14 +5,16 @@ import { AuthContext } from '../context/AuthProvider';
 const Login = (props) => {
   const [email, setEmail] = useState("apm@apm.com");
   const [password, setPassword] = useState("Test@123");
-  const [message, setMessage] = useState("");
-  const { login } = useContext(AuthContext);
+  const { login, setNotificationObj } = useContext(AuthContext);
   const handleLogin = async (e) => {
     try {
       await login(email, password);
       props.history.push("/")
     } catch (err) {
-      setMessage(err.message);
+      setNotificationObj({
+        message: err.message,
+        open: true,
+      });
       setPassword("");
     }
   }
@@ -90,7 +92,6 @@ const Login = (props) => {
                 className={classes.mt}
                 onChange={(e) => setPassword(e.target.value)}
               ></TextField>
-              <Typography style={{ color: "red" }}>{message}</Typography>
             </CardContent>
             <CardActions>
               <Button

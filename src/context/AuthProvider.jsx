@@ -7,6 +7,9 @@ export function AuthProvider({ children }) {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
+  const [notificationObj, setNotificationObj] = useState({
+    open: false
+  });
 
   function login(email, password) {
     return firebaseAuth.signInWithEmailAndPassword(email, password);
@@ -44,7 +47,8 @@ export function AuthProvider({ children }) {
   let value = {
     currentUser,
     currentUserInfo,
-    fetchCurrentUser,
+    notificationObj,
+    setNotificationObj,
     login,
     signOut,
     signUp

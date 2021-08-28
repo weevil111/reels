@@ -116,12 +116,15 @@ const Post = ({ post }) => {
       textDecoration: "underline",
       paddingBottom: "8px",
       cursor: "pointer"
+     },
+     caption: {
+       padding: "2px",
      }
   });
   const classes = useStyles();
   const postDate = new Date(post.createdAt.toMillis());
   const postTimeFormatted = `${postDate.toDateString()} - ${postDate.toLocaleTimeString()}`;
-  return user ? ( <>
+  return user ? (
     <Grid container justifyContent="center" className={classes.container}>
       <Grid item xs={12} sm={8} lg={4} zeroMinWidth>
         <Card>
@@ -138,6 +141,7 @@ const Post = ({ post }) => {
             subheader={postTimeFormatted}
           />
           <CardContent>
+            <Typography variant="body1" className={classes.caption}>{post.caption}</Typography>
             <CardMedia>
               <div className="video-container">
                 <Video src={post.mediaLink}></Video>
@@ -199,10 +203,6 @@ const Post = ({ post }) => {
         </Card>
       </Grid>
     </Grid>
-    <Modal open={open} onClose={() => setOpen(false)}>
-      <Typography variant="body1">Hello from modal</Typography>
-    </Modal>
-    </>
     ) : (<Typography variant="h3">No posts found</Typography>);
 }
 

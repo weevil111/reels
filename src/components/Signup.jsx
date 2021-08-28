@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom';
 import { firebaseDB, firebaseStorage } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider';
 const Signup = (props) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("elonmusk@gmail.com");
+  const [password, setPassword] = useState("Test@123");
+  const [username, setUsername] = useState("elon_musk");
   const [profileImage, setProfileImage] = useState(null);
   const [message, setMessage] = useState("");
-  const { signUp, signOut} = useContext(AuthContext);
+  const { signUp, signOut, setNotificationObj } = useContext(AuthContext);
 
   const handleFileSubmit = (event) => {
     let fileObject = event.target.files[0];
@@ -45,7 +45,11 @@ const Signup = (props) => {
           profileImageUrl,
           postsCreated: []
         });
-        alert("Sigup successful ! Please login to continue")
+        setNotificationObj({
+          message: "Sigup successful 😎 Please login to continue",
+          open: true,
+          color: "#4caf50"
+        })
         signOut()
       }
     } catch (err) {
@@ -68,15 +72,11 @@ const Signup = (props) => {
     textCenter: {
       textAlign: "center"
     },
-    uploadButton: {
-      marginBottom: "1rem",
-      padding: "1rem",
-      maxWidth: "100%"
-    },
     uploadText: {
       overflow: "hidden",
       whiteSpace: "nowrap",
-      textOverflow: "ellipsis"
+      textOverflow: "ellipsis",
+      textAlign: "center"
     },
     mb: {
       marginBottom: "1rem"
@@ -130,16 +130,7 @@ const Signup = (props) => {
               <Typography style={{ color: "red" }}>{message}</Typography>
             </CardContent>
             <CardActions className={classes.centerElements}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                className={classes.uploadButton}
-                startIcon={<Camera></Camera>}
-              >
-                <InputLabel 
-                  htmlFor="inputFile"
-                  className={classes.uploadText}
-                  >{profileImage? profileImage.name: "Upload a profile image"}</InputLabel>
+              <label htmlFor="inputFile" className={classes.fullWidth}>
                 <Input
                   type="file"
                   style={{ display: "none" }}
@@ -148,7 +139,16 @@ const Signup = (props) => {
                   inputProps={{ accept: "image/*" }}
                   onChange={(e) => handleFileSubmit(e)}
                 ></Input>
-              </Button>
+              <Typography variant="body1" component="div" className={classes.uploadText}>{profileImage ? profileImage.name:""}</Typography>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  style={{width: "100%", marginBottom: "1rem"}}
+                  startIcon={<Camera></Camera>}
+                  component="div"
+                > Upload
+                </Button>
+              </label>
               <Button
                 variant="contained"
                 color="primary"
@@ -158,13 +158,13 @@ const Signup = (props) => {
             </CardActions>
           </Card>
           <Card variant="outlined" className={classes.pd}>
-          <Typography className={classes.textCenter}>
-            Have an account ?
-            <Button variant="text" color="primary">
-              <Link to="/login">Login</Link>
-            </Button>
-          </Typography>
-        </Card>
+            <Typography className={classes.textCenter}>
+              Have an account ?
+              <Button variant="text" color="primary">
+                <Link to="/login">Login</Link>
+              </Button>
+            </Typography>
+          </Card>
         </Grid>
       </Grid>
     </Container>

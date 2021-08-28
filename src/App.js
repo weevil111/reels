@@ -6,6 +6,8 @@ import Feeds from "./components/Feeds"
 import Profile from "./components/Profile"
 import Signup from './components/Signup';
 import { AuthContext, AuthProvider } from './context/AuthProvider';
+import Upload from './components/Upload';
+import Notification from './components/Notification';
 
 function App() {
   let { currentUser } = useContext(AuthContext);
@@ -17,7 +19,8 @@ function App() {
           <Switch>
             {currentUser ? (<>
               <Route path="/" component={Feeds} exact></Route>
-              <Route path="/profile" component={Profile}></Route>
+              <Route path="/profile" component={Profile} exact></Route>
+              <Route path="/upload" component={Upload}></Route>
               <Redirect to="/"></Redirect>
             </>) : (<>
               <Route path="/login" component={Login} exact></Route>
@@ -28,6 +31,7 @@ function App() {
           </Switch>
         </div>
       </Router>
+      <Notification></Notification>
     </AuthProvider>
   );
 }

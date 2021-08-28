@@ -1,5 +1,5 @@
-import { Avatar, Button, Grid, makeStyles, Menu, MenuItem } from '@material-ui/core'
-import { AccountCircle, ExitToApp, ExploreOutlined, HomeOutlined, Input, PermIdentity, VpnKey } from '@material-ui/icons'
+import { Avatar, Button, Grid, Hidden, makeStyles, Menu, MenuItem } from '@material-ui/core'
+import { AccountCircle, ExitToApp, ExploreOutlined, HomeOutlined, Input, MovieCreationOutlined, PermIdentity, VpnKey } from '@material-ui/icons'
 import React, { useState } from 'react'
 import { useContext } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
@@ -53,25 +53,30 @@ const Header = () => {
       alignItems="center"
       className={classes.outerContainer}
     >
-      <Grid item xs={4}>
+      <Grid item xs={2} sm={4}>
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/840px-Instagram_logo.svg.png"
           alt="Instagram logo"
           onClick={() => navigate("/")}
           className={classes.img}
         />
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={6}>
         {currentUserInfo ? (<div className={classes.menuOptions}>
           <Button 
             onClick={() => navigate("/")}
             startIcon={<HomeOutlined></HomeOutlined>}
             style={{alignItems: "flex-start" }}
-            >Home</Button>
+            ><Hidden smDown>Home</Hidden></Button>
           <Button 
             onClick={() => navigate("/")}
             startIcon={<ExploreOutlined></ExploreOutlined>}
             style={{alignItems: "flex-start" }}
-            >Explore</Button>
+            ><Hidden smDown>Explore</Hidden></Button>
+          <Button 
+            onClick={() => navigate("/upload")}
+            startIcon={<MovieCreationOutlined></MovieCreationOutlined>}
+            style={{alignItems: "flex-start" }}
+            ><Hidden smDown>Upload</Hidden></Button>
           <Avatar
             src={currentUserInfo.profileImageUrl}
             onClick={(e) => setAnchorEl(e.target)}
