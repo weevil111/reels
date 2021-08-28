@@ -8,14 +8,14 @@ import Signup from './components/Signup';
 import { AuthContext, AuthProvider } from './context/AuthProvider';
 
 function App() {
-  let {currentUser} = useContext(AuthContext);
+  let { currentUser } = useContext(AuthContext);
   return (
     <AuthProvider>
       <Router>
         <div className="App">
           <Header></Header>
           <Switch>
-            {currentUser? (<>
+            {currentUser ? (<>
               <Route path="/" component={Feeds} exact></Route>
               <Route path="/profile" component={Profile}></Route>
               <Redirect to="/"></Redirect>

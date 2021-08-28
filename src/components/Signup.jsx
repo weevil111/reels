@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 import { firebaseDB, firebaseStorage } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider';
 const Signup = (props) => {
-  const [email, setEmail] = useState("apm@apm.com");
-  const [password, setPassword] = useState("Test@123");
-  const [username, setUsername] = useState("😎weevil😎");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [message, setMessage] = useState("");
   const { signUp, signOut} = useContext(AuthContext);
@@ -81,6 +81,9 @@ const Signup = (props) => {
     mb: {
       marginBottom: "1rem"
     },
+    mt: {
+      marginTop: "2rem"
+    },
     ma: {
       margin: "1rem"
     },
@@ -90,7 +93,7 @@ const Signup = (props) => {
   });
   let classes = useStyles();
   return (
-    <Container>
+    <Container className={classes.mt}>
       <Grid container justifyContent="center">
         <Grid item xs={12} sm={8} md={4}>
           <Card variant="outlined">

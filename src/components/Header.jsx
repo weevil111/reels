@@ -37,7 +37,8 @@ const Header = () => {
       position: "sticky",
       top: "0",
       background: "white",
-      zIndex: "999"
+      zIndex: "999",
+      height: "5rem"
     }
   })
   const navigate = (path) => {
