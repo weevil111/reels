@@ -126,7 +126,7 @@ const Feeds = (props) => {
   const classes = useStyles();
 
   return (<>
-    {/* <div className="uploadVideo">
+    <div className="uploadVideo">
       <div>
         <input
           type="file"
@@ -143,7 +143,7 @@ const Feeds = (props) => {
         </label>
       </div>
       <p style={{ color: "red" }}>{errMessage}</p>
-    </div> */}
+    </div>
     <div className={classes.postList}>
       {posts.map(post => (
         <Post key={post.pid} post={post}></Post>

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthProvider';
 const Login = (props) => {
   const [email, setEmail] = useState("apm@apm.com");
-  const [password, setPassword] = useState("123456");
+  const [password, setPassword] = useState("Test@123");
   const [message, setMessage] = useState("");
   const {login} = useContext(AuthContext);
   const handleLogin = async (e) => {
@@ -13,7 +13,6 @@ const Login = (props) => {
       props.history.push("/")
     }catch(err){
       setMessage(err.message);
-      setEmail("");
       setPassword("");
     }
   }

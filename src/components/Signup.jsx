@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom';
 import { firebaseDB, firebaseStorage } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider';
 const Signup = (props) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("apm@apm.com");
+  const [password, setPassword] = useState("Test@123");
+  const [username, setUsername] = useState("😎weevil😎");
   const [profileImage, setProfileImage] = useState(null);
   const [message, setMessage] = useState("");
-  const { signUp } = useContext(AuthContext);
+  const { signUp, signOut} = useContext(AuthContext);
 
   const handleFileSubmit = (event) => {
     let fileObject = event.target.files[0];
@@ -38,14 +38,15 @@ const Signup = (props) => {
       // It indicates sucess of the upload
       async function fun3() {
         let profileImageUrl = await uploadPhotoObject.snapshot.ref.getDownloadURL();
-        firebaseDB.collection("users").doc(uid).set({
+        await firebaseDB.collection("users").doc(uid).set({
           email,
           userId: uid,
           username,
           profileImageUrl,
           postsCreated: []
         });
-        props.history.push("/");
+        alert("Sigup successful ! Please login to continue")
+        signOut()
       }
     } catch (err) {
       setMessage(err.message)

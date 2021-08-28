@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Grid, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Grid, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Modal, TextField, Typography } from '@material-ui/core';
 import { Favorite, FavoriteBorder, ModeCommentOutlined, MoreVert, ShareOutlined } from '@material-ui/icons';
 import React, { useEffect, useState, useContext } from 'react'
 import ReactDOM from 'react-dom';
@@ -11,6 +11,7 @@ const Post = ({ post }) => {
   let [user, setUser] = useState({});
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -120,7 +121,7 @@ const Post = ({ post }) => {
   const classes = useStyles();
   const postDate = new Date(post.createdAt.toMillis());
   const postTimeFormatted = `${postDate.toDateString()} - ${postDate.toLocaleTimeString()}`;
-  return user ? (
+  return user ? ( <>
     <Grid container justifyContent="center" className={classes.container}>
       <Grid item xs={12} sm={8} lg={4} zeroMinWidth>
         <Card>
@@ -154,7 +155,7 @@ const Post = ({ post }) => {
                   :
                   (<FavoriteBorder fontSize="large"></FavoriteBorder>)}
               </IconButton>
-              <IconButton size="small">
+              <IconButton size="small" onClick={() => setOpen(true)}>
                 <ModeCommentOutlined fontSize="large"></ModeCommentOutlined>
               </IconButton>
               <IconButton size="small">
@@ -177,7 +178,7 @@ const Post = ({ post }) => {
                 />
               </ListItem>) : null}
             <Typography className={classes.modalLinkText}>View all commments</Typography>
-            <div className={classes.userComment}>
+            {/* <div className={classes.userComment}>
               <TextField
                 variant="outlined"
                 placeholder="Add a comment"
@@ -193,11 +194,16 @@ const Post = ({ post }) => {
                 onClick={handleComment}
                 style={{ margin: "0 24px 8px 24px" }}
               >Post</Button>
-            </div>
+            </div> */}
           </CardActions>
         </Card>
       </Grid>
-    </Grid>) : (<Typography variant="h3">No posts found</Typography>);
+    </Grid>
+    <Modal open={open} onClose={() => setOpen(false)}>
+      <Typography variant="body1">Hello from modal</Typography>
+    </Modal>
+    </>
+    ) : (<Typography variant="h3">No posts found</Typography>);
 }
 
 function Video(props) {
