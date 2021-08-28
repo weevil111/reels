@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Grid, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Modal, TextField, Typography } from '@material-ui/core';
+import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, makeStyles, TextField, Typography } from '@material-ui/core';
 import { Favorite, FavoriteBorder, ModeCommentOutlined, MoreVert, ShareOutlined } from '@material-ui/icons';
 import React, { useEffect, useState, useContext } from 'react'
 import ReactDOM from 'react-dom';
@@ -11,11 +11,10 @@ const Post = ({ post }) => {
   let [user, setUser] = useState({});
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
-  const [open, setOpen] = useState(false);
 
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, setNotificationObj } = useContext(AuthContext);
 
   const handleComment = async () => {
     let doc = await firebaseDB.collection("posts").doc(pid).get();
@@ -55,10 +54,20 @@ const Post = ({ post }) => {
       let filteredLikes = postDoc.likes.filter(el => el !== currentUser.uid);
       postDoc.likes = filteredLikes;
       await firebaseDB.collection("posts").doc(pid).set(postDoc);
+      setNotificationObj({
+        message: "You unliked the video  💔",
+        open: true,
+        color: "#2196f3"
+      })
       setIsLiked(false);
     } else {
       postDoc.likes.push(currentUser.uid);
       await firebaseDB.collection("posts").doc(pid).set(postDoc);
+      setNotificationObj({
+        message: "You liked the video  ❤",
+        open: true,
+        color: "#2196f3"
+      })
       setIsLiked(true);
     }
   }
@@ -100,6 +109,11 @@ const Post = ({ post }) => {
       flexDirection: "column",
       alignItems: "flex-start"
     },
+    commentList:{
+      maxHeight: "10rem",
+      overflow: "auto",
+      width: "100%"
+    },
     comments: {
       overflow: "hidden",
       whiteSpace: "nowrap",
@@ -111,14 +125,12 @@ const Post = ({ post }) => {
       alignItems: "center",
       width: "100%"
     },
-    modalLinkText:{ 
-      color: "rgba(0,0,0,0.5)", 
-      textDecoration: "underline",
-      paddingBottom: "8px",
-      cursor: "pointer"
-     },
      caption: {
        padding: "2px",
+     },
+     imagePost: {
+       objectFit: "contain",
+       width: "100%"
      }
   });
   const classes = useStyles();
@@ -143,9 +155,13 @@ const Post = ({ post }) => {
           <CardContent>
             <Typography variant="body1" className={classes.caption}>{post.caption}</Typography>
             <CardMedia>
+            {post.type==="image"?(
+              <img src={post.mediaLink} className={classes.imagePost}></img>
+            ):(
               <div className="video-container">
                 <Video src={post.mediaLink}></Video>
               </div>
+            )}
             </CardMedia>
           </CardContent>
           <CardActions className={classes.cardActions}>
@@ -159,7 +175,7 @@ const Post = ({ post }) => {
                   :
                   (<FavoriteBorder fontSize="large"></FavoriteBorder>)}
               </IconButton>
-              <IconButton size="small" onClick={() => setOpen(true)}>
+              <IconButton size="small">
                 <ModeCommentOutlined fontSize="large"></ModeCommentOutlined>
               </IconButton>
               <IconButton size="small">
@@ -170,19 +186,20 @@ const Post = ({ post }) => {
               <div><Typography variant="body1">
                 {isLiked ? `You and ${likesCount} other(s) liked it.` : `${likesCount} people liked it.`}
               </Typography></div>}
-            {commentList.length > 0 ? (
-              <ListItem key={commentList[0].id} disableGutters >
+            <List component="ul" className={classes.commentList}>
+            { commentList.map(comment => (
+              <ListItem key={comment.id} disableGutters >
                 <ListItemIcon>
-                  <Avatar src={commentList[0].profilePic}></Avatar>
+                  <Avatar src={comment.profilePic}></Avatar>
                 </ListItemIcon>
                 <ListItemText
-                  primary={<Typography className={classes.comments}>{commentList[0].username}</Typography>}
-                  secondary={<Typography className={classes.comments} style={{ color: "rgba(0,0,0,0.5)" }}>{commentList[0].comment}</Typography>}
-                  disableTypography
-                />
-              </ListItem>) : null}
-            <Typography className={classes.modalLinkText}>View all commments</Typography>
-            {/* <div className={classes.userComment}>
+                  primary={<Typography className={classes.comments}>{comment.username}</Typography>}
+                  secondary={<Typography className={classes.comments} style={{ color: "rgba(0,0,0,0.5)" }}>{comment.comment}</Typography>}
+                  disableTypography />
+              </ListItem>
+              ))}
+              </List>
+            <div className={classes.userComment}>
               <TextField
                 variant="outlined"
                 placeholder="Add a comment"
@@ -198,7 +215,7 @@ const Post = ({ post }) => {
                 onClick={handleComment}
                 style={{ margin: "0 24px 8px 24px" }}
               >Post</Button>
-            </div> */}
+            </div>
           </CardActions>
         </Card>
       </Grid>

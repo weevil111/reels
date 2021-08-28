@@ -60,13 +60,8 @@ const Header = () => {
           className={classes.img}
         />
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={4}>
         {currentUserInfo ? (<div className={classes.menuOptions}>
-          <Button 
-            onClick={() => navigate("/")}
-            startIcon={<HomeOutlined></HomeOutlined>}
-            style={{alignItems: "flex-start" }}
-            ><Hidden smDown>Home</Hidden></Button>
           <Button 
             onClick={() => navigate("/")}
             startIcon={<ExploreOutlined></ExploreOutlined>}
@@ -81,7 +76,7 @@ const Header = () => {
             src={currentUserInfo.profileImageUrl}
             onClick={(e) => setAnchorEl(e.target)}
             style={{ cursor: "pointer" }}
-          ></Avatar>
+          >{currentUserInfo.email?.charAt(0).toUpperCase()}</Avatar>
           <Menu
             id="header-menu"
             anchorEl={anchorEl}

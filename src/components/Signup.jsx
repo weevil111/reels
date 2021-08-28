@@ -12,32 +12,36 @@ const Signup = (props) => {
   const [message, setMessage] = useState("");
   const { signUp, signOut, setNotificationObj } = useContext(AuthContext);
 
-  const handleFileSubmit = (event) => {
-    let fileObject = event.target.files[0];
-    setProfileImage(fileObject);
+  function showErrorNotification(message) {
+    setNotificationObj({
+      open: true,
+      message
+    })
+  }
+
+  const handleFileSubmit = (e) => {
+    let file = e.target.files[0];
+    if (!file) {
+      return;
+    } else if(file.type.split("/")[0] !== "image") {
+      showErrorNotification("Unsupported file type");
+      e.target.value = "";
+      setProfileImage(null);
+      return;
+    } else if ((file.size / 1024 / 1024) > 1) {
+      showErrorNotification("File too large ( > 1 MB)");
+      e.target.value = "";
+      setProfileImage(null);
+      return;
+    }
+    setProfileImage(file);
   }
 
   const handleSignUp = async () => {
     try {
       let response = await signUp(email, password);
       let uid = response.user.uid;
-      const uploadPhotoObject = firebaseStorage.ref(`/media/${uid}/profile/profilePhoto.jpg`).put(profileImage);
-      uploadPhotoObject.on("state_changed", fun1, fun2, fun3);
-      // to track the progess of the upload
-      function fun1(snapshot) {
-        let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(progress);
-
-      }
-
-      // It indicates an error
-      function fun2(error) {
-        console.log(error);
-      }
-
-      // It indicates sucess of the upload
-      async function fun3() {
-        let profileImageUrl = await uploadPhotoObject.snapshot.ref.getDownloadURL();
+      async function updateUserInformation(profileImageUrl=""){
         await firebaseDB.collection("users").doc(uid).set({
           email,
           userId: uid,
@@ -46,14 +50,38 @@ const Signup = (props) => {
           postsCreated: []
         });
         setNotificationObj({
-          message: "Sigup successful 😎 Please login to continue",
+          message: "Sigup successful 😎",
           open: true,
           color: "#4caf50"
         })
-        signOut()
+        window?.location.reload();
+      }
+      if(profileImage){
+        uploadPhotoToFirebase();
+      }else{
+        updateUserInformation();
+      }
+      function uploadPhotoToFirebase(){
+        const uploadPhotoObject = firebaseStorage.ref(`/media/${uid}/profile/profilePhoto.jpg`).put(profileImage);
+        uploadPhotoObject.on("state_changed", fun1, fun2, fun3);
+        // to track the progess of the upload
+        function fun1(snapshot) {
+          let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        }
+  
+        // It indicates an error
+        function fun2(error) {
+          console.log(error);
+        }
+  
+        // It indicates sucess of the upload
+        async function fun3() {
+          let profileImageUrl = await uploadPhotoObject.snapshot.ref.getDownloadURL();
+          updateUserInformation(profileImageUrl)
+        }
       }
     } catch (err) {
-      setMessage(err.message)
+      showErrorNotification(err.message)
     }
   }
   let useStyles = makeStyles({
@@ -127,7 +155,6 @@ const Signup = (props) => {
                 size="small"
                 onChange={(e) => setPassword(e.target.value)}
               ></TextField>
-              <Typography style={{ color: "red" }}>{message}</Typography>
             </CardContent>
             <CardActions className={classes.centerElements}>
               <label htmlFor="inputFile" className={classes.fullWidth}>
@@ -139,11 +166,11 @@ const Signup = (props) => {
                   inputProps={{ accept: "image/*" }}
                   onChange={(e) => handleFileSubmit(e)}
                 ></Input>
-              <Typography variant="body1" component="div" className={classes.uploadText}>{profileImage ? profileImage.name:""}</Typography>
+                <Typography variant="body1" component="div" className={classes.uploadText}>{profileImage ? profileImage.name : ""}</Typography>
                 <Button
                   variant="outlined"
                   color="secondary"
-                  style={{width: "100%", marginBottom: "1rem"}}
+                  style={{ width: "100%", marginBottom: "1rem" }}
                   startIcon={<Camera></Camera>}
                   component="div"
                 > Upload

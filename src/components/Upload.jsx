@@ -2,12 +2,11 @@ import React, { useContext, useState } from 'react'
 import { AuthContext } from '../context/AuthProvider'
 import { v4 as uuidv4 } from 'uuid';
 import { PhotoCamera } from '@material-ui/icons';
-import { Button, Grid, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Button, Grid, makeStyles, Typography } from '@material-ui/core';
 import { firebaseDB, firebaseStorage, timestamp } from '../config/firebase';
 
 function Upload({ history }) {
   const [caption, setCaption] = useState("");
-  const [fileLocalPath, setfileLocalPath] = useState("");
   const { currentUser, setNotificationObj } = useContext(AuthContext);
   const [mediaFile, setMediaFile] = useState(null);
 
@@ -19,15 +18,14 @@ function Upload({ history }) {
   }
   const handleInputFile = (e) => {
     let file = e.target.files[0];
-    setfileLocalPath("")
     if (!file) {
       return;
     } else if ((file.size / 1024 / 1024) > 10) {
       showErrorNotification("File too large ( > 10 MB)");
+      setMediaFile(null);
       e.target.value = "";
       return;
     }
-    setfileLocalPath(e.target.value);
     setMediaFile(file);
   }
   const handleUploadFile = async () => {
@@ -83,7 +81,6 @@ function Upload({ history }) {
         oldDocument.postsCreated.push(pid);
         await firebaseDB.collection("users").doc(uid).set(oldDocument);
         setMediaFile(null);
-        setfileLocalPath("");
         setCaption("");
         history?.push("/");
       }
@@ -140,7 +137,7 @@ function Upload({ history }) {
             id="videoInput"
             style={{ display: "none" }}
             onChange={handleInputFile} />
-          <Typography variant="body1" component="div" className={classes.singleLineText}>{fileLocalPath}</Typography>
+          <Typography variant="body1" component="div" className={classes.singleLineText}>{mediaFile?.name}</Typography>
           <Button
             variant="contained"
             color="secondary"
