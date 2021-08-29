@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { AuthContext } from '../context/AuthProvider'
 import { v4 as uuidv4 } from 'uuid';
 import { PhotoCamera } from '@material-ui/icons';
@@ -7,9 +7,11 @@ import { firebaseDB, firebaseStorage, timestamp } from '../config/firebase';
 
 function Upload({ history }) {
   const [caption, setCaption] = useState("");
+  const [buttonDisabled, setButtonDisabled] = useState(false)
   const { currentUser, setNotificationObj } = useContext(AuthContext);
   const [mediaFile, setMediaFile] = useState(null);
   const [mediaFileType, setMediaFileType] = useState("")
+  const isCurrentUserGuest = currentUser?.email === "guest@reels.com";
 
   function showErrorNotification(message) {
     setNotificationObj({
@@ -25,7 +27,9 @@ function Upload({ history }) {
 
     let errorMessage = "";
     const mediaType = file.type.split("/")[0];
-    if (!["video", "image"].includes(mediaType)) {
+    if(isCurrentUserGuest){
+      errorMessage = "Sorry ! Guest users cannot upload content 😞";
+    }else if (!["video", "image"].includes(mediaType)) {
       errorMessage = "Unsupported media type.";
     } else if ((file.size / 1024 / 1024) > 10) {
       errorMessage = "File too large ( > 10 MB)";
@@ -41,19 +45,21 @@ function Upload({ history }) {
     setMediaFile(file);
   }
   const handleUploadFile = async () => {
+
     if (!mediaFile) {
       return;
     }
     
-    if (caption.length > 250) {
+    if (caption.length > 250 ) {
       showErrorNotification("Caption length too long ( > 250 characters)")
       return;
     }
 
     let uid = currentUser.uid;
     try {
+      setButtonDisabled(true);
       const uploadVideoObject = firebaseStorage
-        .ref(`/media/${uid}/posts/${mediaFileType}/${Date.now()}.mp4`)
+        .ref(`/media/${uid}/posts/${mediaFileType}/${Date.now()}.${mediaFileType==="image"?"jpg":"mp4"}`)
         .put(mediaFile);
       uploadVideoObject.on("state_changed", fun1, fun2, fun3);
 
@@ -89,6 +95,7 @@ function Upload({ history }) {
         await firebaseDB.collection("users").doc(uid).set(oldDocument);
         setMediaFile(null);
         setCaption("");
+        setButtonDisabled(false)
         history?.push("/");
       }
 
@@ -96,6 +103,13 @@ function Upload({ history }) {
       console.log(err);
     }
   }
+
+  useEffect(() => {
+    if(isCurrentUserGuest){
+      showErrorNotification("Sorry ! Guest users cannot upload content 😞");
+    }
+  }, [isCurrentUserGuest])
+
   const useStyles = makeStyles({
     formContainer: {
       display: "flex",
@@ -151,6 +165,7 @@ function Upload({ history }) {
             color="secondary"
             style={{ width: "100%" }}
             startIcon={<PhotoCamera></PhotoCamera>}
+            disabled={buttonDisabled}
             component="div"
           >Upload</Button>
         </label>
@@ -158,6 +173,7 @@ function Upload({ history }) {
           variant="contained"
           color="primary"
           onClick={handleUploadFile}
+          disabled={buttonDisabled}
         >Post</Button>
       </Grid>
     </Grid>

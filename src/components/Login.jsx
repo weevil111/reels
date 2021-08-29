@@ -1,4 +1,5 @@
 import { Container, Grid, Card, CardMedia, CardContent, TextField, CardActions, Button, Typography, makeStyles, Hidden } from '@material-ui/core';
+import { ArrowForward } from '@material-ui/icons';
 import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthProvider';
@@ -7,6 +8,13 @@ const Login = (props) => {
   const [password, setPassword] = useState("");
   const { login, setNotificationObj } = useContext(AuthContext);
   const handleLogin = async (e) => {
+    if(!email.trim() || !password){
+      setNotificationObj({
+        open: true,
+        message: "Please fill up all the fields !"
+      });
+      return;
+    }
     try {
       await login(email, password);
       props.history.push("/")
@@ -18,6 +26,19 @@ const Login = (props) => {
       setPassword("");
     }
   }
+
+  const guestLogin = async function(){
+    try {
+      await login("guest@reels.com", "Test@123");
+      props.history.push("/")
+    } catch (err) {
+      setNotificationObj({
+        message: err.message,
+        open: true,
+      });
+    }
+  }
+  
   let useStyles = makeStyles({
     cardContent: {
       display: "flex",
@@ -102,6 +123,13 @@ const Login = (props) => {
                 className={classes.fullWidth}
               >Login</Button>
             </CardActions>
+            <Typography variant="subtitle2" style={{ textAlign: "center" }}>OR</Typography>
+            <Button
+              color="secondary"
+              onClick={guestLogin}
+              className={classes.fullWidth}
+              endIcon={<ArrowForward></ArrowForward>}
+            >Continue as a guest </Button>
             <Typography className={classes.forgotPassword}>Forgot password ?</Typography>
           </Card>
           <Card variant="outlined" className={classes.pd}>

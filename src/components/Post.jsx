@@ -15,9 +15,18 @@ const Post = ({ post }) => {
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const { currentUser, setNotificationObj } = useContext(AuthContext);
+  const isCurrentUserGuest = currentUser?.email === "guest@reels.com";
+
+  function sendNotification(message, info = true) {
+    setNotificationObj({
+      message,
+      open: true,
+      color: info ? "#2196f3" : undefined
+    })
+  }
 
   const handleComment = async () => {
-    if(comment.trim() === ""){
+    if (comment.trim() === "") {
       return;
     }
     let doc = await firebaseDB.collection("posts").doc(pid).get();
@@ -27,7 +36,11 @@ const Post = ({ post }) => {
       comment
     };
     oldDocument.comments = [commentObject, ...oldDocument.comments];
-    await firebaseDB.collection("posts").doc(pid).set(oldDocument);
+    if (isCurrentUserGuest) {
+      sendNotification("Guest user's comments are not saved in the database !", false);
+    } else {
+      await firebaseDB.collection("posts").doc(pid).set(oldDocument);
+    }
     let currentCommentData = await fetchCommentUserDetails([commentObject]);
     setCommentList(oldCommentList => {
       return currentCommentData.concat(oldCommentList);
@@ -56,21 +69,21 @@ const Post = ({ post }) => {
     if (isLiked) {
       let filteredLikes = postDoc.likes.filter(el => el !== currentUser.uid);
       postDoc.likes = filteredLikes;
-      await firebaseDB.collection("posts").doc(pid).set(postDoc);
-      setNotificationObj({
-        message: "You unliked the video  💔",
-        open: true,
-        color: "#2196f3"
-      })
+      if (isCurrentUserGuest) {
+        sendNotification("Guest user's interactions are not saved in the database 😢", false)
+      } else {
+        await firebaseDB.collection("posts").doc(pid).set(postDoc);
+        sendNotification(`You unliked the ${post.type}  💔`);
+      }
       setIsLiked(false);
     } else {
       postDoc.likes.push(currentUser.uid);
-      await firebaseDB.collection("posts").doc(pid).set(postDoc);
-      setNotificationObj({
-        message: "You liked the video  ❤",
-        open: true,
-        color: "#2196f3"
-      })
+      if (isCurrentUserGuest) {
+        sendNotification("Guest user's interactions are not saved in the database 😢", false)
+      } else {
+        await firebaseDB.collection("posts").doc(pid).set(postDoc);
+        sendNotification(`You liked the ${post.type}  ❤`);
+      }
       setIsLiked(true);
     }
   }
@@ -112,7 +125,7 @@ const Post = ({ post }) => {
       flexDirection: "column",
       alignItems: "flex-start"
     },
-    commentList:{
+    commentList: {
       maxHeight: "10rem",
       overflow: "auto",
       width: "100%"
@@ -128,21 +141,21 @@ const Post = ({ post }) => {
       alignItems: "center",
       width: "100%"
     },
-     caption: {
-       padding: "2px",
-     },
-     imagePost: {
-       objectFit: "contain",
-       width: "100%"
-     }
+    caption: {
+      padding: "2px",
+    },
+    imagePost: {
+      objectFit: "contain",
+      width: "100%"
+    }
   });
   const classes = useStyles();
   const postDate = new Date(post.createdAt.toMillis());
   const postTimeFormatted = `${postDate.toDateString()} - ${postDate.toLocaleTimeString()}`;
-  const avatarLetter = user ? (user.username ? user.username[0]: user.email[0]) :"😎";
+  const avatarLetter = user ? (user.username ? user.username[0] : user.email[0]) : "😎";
   return user ? (
     <Grid container justifyContent="center" className={classes.container}>
-      <Grid item xs={12} sm={8} lg={3} zeroMinWidth>
+      <Grid item xs={12} sm={8} lg={4} zeroMinWidth>
         <Card>
           <CardHeader
             avatar={
@@ -159,13 +172,13 @@ const Post = ({ post }) => {
           <CardContent>
             <Typography variant="body1" className={classes.caption}>{post.caption}</Typography>
             <CardMedia>
-            {post.type==="image"?(
-              <img src={post.mediaLink} className={classes.imagePost} alt="Post media"></img>
-            ):(
-              <div className="video-container">
-                <Video src={post.mediaLink}></Video>
-              </div>
-            )}
+              {post.type === "image" ? (
+                <img src={post.mediaLink} className={classes.imagePost} alt="Post media"></img>
+              ) : (
+                <div className="video-container">
+                  <Video src={post.mediaLink}></Video>
+                </div>
+              )}
             </CardMedia>
           </CardContent>
           <CardActions className={classes.cardActions}>
@@ -191,18 +204,18 @@ const Post = ({ post }) => {
                 {isLiked ? `You and ${likesCount} other(s) liked it.` : `${likesCount} people liked it.`}
               </Typography></div>}
             <List component="ul" className={classes.commentList}>
-            { commentList.map(comment => (
-              <ListItem key={comment.id} disableGutters >
-                <ListItemIcon>
-                  <Avatar src={comment.profilePic}></Avatar>
-                </ListItemIcon>
-                <ListItemText
-                  primary={<Typography className={classes.comments}>{comment.username}</Typography>}
-                  secondary={<Typography className={classes.comments} style={{ color: "rgba(0,0,0,0.5)" }}>{comment.comment}</Typography>}
-                  disableTypography />
-              </ListItem>
+              {commentList.map(comment => (
+                <ListItem key={comment.id} disableGutters >
+                  <ListItemIcon>
+                    <Avatar src={comment.profilePic}>{comment.username?.charAt(0).toUpperCase()}</Avatar>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<Typography className={classes.comments}>{comment.username}</Typography>}
+                    secondary={<Typography className={classes.comments} style={{ color: "rgba(0,0,0,0.5)" }}>{comment.comment}</Typography>}
+                    disableTypography />
+                </ListItem>
               ))}
-              </List>
+            </List>
             <div className={classes.userComment}>
               <TextField
                 variant="outlined"
@@ -224,7 +237,7 @@ const Post = ({ post }) => {
         </Card>
       </Grid>
     </Grid>
-    ) : (<Typography variant="h3">No posts found</Typography>);
+  ) : (<></>);
 }
 
 function Video(props) {

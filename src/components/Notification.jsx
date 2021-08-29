@@ -29,7 +29,7 @@ function Notification() {
     <Snackbar
       className={classes.snackbar}
       anchorOrigin={{
-        vertical: 'bottom',
+        vertical: 'top',
         horizontal: 'center',
       }}
       open={notificationObj.open}
