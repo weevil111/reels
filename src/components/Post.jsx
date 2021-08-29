@@ -8,7 +8,7 @@ import { AuthContext } from '../context/AuthProvider';
 
 const Post = ({ post }) => {
   const { uid, pid } = post;
-  let [user, setUser] = useState({});
+  let [user, setUser] = useState(null);
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
 
@@ -139,13 +139,14 @@ const Post = ({ post }) => {
   const classes = useStyles();
   const postDate = new Date(post.createdAt.toMillis());
   const postTimeFormatted = `${postDate.toDateString()} - ${postDate.toLocaleTimeString()}`;
+  const avatarLetter = user ? (user.username ? user.username[0]: user.email[0]) :"😎";
   return user ? (
     <Grid container justifyContent="center" className={classes.container}>
       <Grid item xs={12} sm={8} lg={3} zeroMinWidth>
         <Card>
           <CardHeader
             avatar={
-              <Avatar src={user.profileImageUrl}></Avatar>
+              <Avatar src={user.profileImageUrl}>{avatarLetter.toUpperCase()}</Avatar>
             }
             action={
               <IconButton aria-label="settings">
