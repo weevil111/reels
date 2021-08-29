@@ -1,10 +1,10 @@
-import { Container, Grid, Paper, Card, CardMedia, CardContent, TextField, CardActions, Button, Typography, makeStyles, Hidden, Fade } from '@material-ui/core';
+import { Container, Grid, Card, CardMedia, CardContent, TextField, CardActions, Button, Typography, makeStyles, Hidden } from '@material-ui/core';
 import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthProvider';
 const Login = (props) => {
-  const [email, setEmail] = useState("apm@apm.com");
-  const [password, setPassword] = useState("Test@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { login, setNotificationObj } = useContext(AuthContext);
   const handleLogin = async (e) => {
     try {
@@ -50,7 +50,7 @@ const Login = (props) => {
     textCenter: {
       textAlign: "center"
     },
-    forgotPassword:{
+    forgotPassword: {
       cursor: "pointer",
       margin: "1rem",
       textAlign: "center"
@@ -60,15 +60,16 @@ const Login = (props) => {
   let classes = useStyles();
 
   return (
-  <Container>
+    <Container>
       <Grid container spacing={2} justifyContent="center" alignItems="center" >
         <Hidden xsDown>
-        <Grid item sm={6} md={6} lg={5}>
-          <img
-            src="/login.png"
-            className={classes.carousalContainerImage}
-          />
-        </Grid>
+          <Grid item sm={6} md={6} lg={5}>
+            <img
+              src="/login.png"
+              className={classes.carousalContainerImage}
+              alt=""
+            />
+          </Grid>
         </Hidden>
         <Grid item xs={8} sm={6} md={4}>
           <Card variant="outlined">
@@ -101,7 +102,7 @@ const Login = (props) => {
                 className={classes.fullWidth}
               >Login</Button>
             </CardActions>
-              <Typography className={classes.forgotPassword}>Forgot password ?</Typography>
+            <Typography className={classes.forgotPassword}>Forgot password ?</Typography>
           </Card>
           <Card variant="outlined" className={classes.pd}>
             <Typography className={classes.textCenter}>

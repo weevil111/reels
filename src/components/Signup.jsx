@@ -1,16 +1,15 @@
-import { Container, Grid, Card, CardMedia, CardContent, TextField, CardActions, Button, Typography, makeStyles, Input, InputLabel } from '@material-ui/core';
+import { Container, Grid, Card, CardMedia, CardContent, TextField, CardActions, Button, Typography, makeStyles, Input } from '@material-ui/core';
 import { Camera } from '@material-ui/icons';
 import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { firebaseDB, firebaseStorage } from '../config/firebase';
 import { AuthContext } from '../context/AuthProvider';
 const Signup = (props) => {
-  const [email, setEmail] = useState("elonmusk@gmail.com");
-  const [password, setPassword] = useState("Test@123");
-  const [username, setUsername] = useState("elon_musk");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [profileImage, setProfileImage] = useState(null);
-  const [message, setMessage] = useState("");
-  const { signUp, signOut, setNotificationObj } = useContext(AuthContext);
+  const { signUp, setNotificationObj } = useContext(AuthContext);
 
   function showErrorNotification(message) {
     setNotificationObj({
@@ -67,6 +66,7 @@ const Signup = (props) => {
         // to track the progess of the upload
         function fun1(snapshot) {
           let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload progres : ${progress} %`);
         }
   
         // It indicates an error

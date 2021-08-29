@@ -1,5 +1,5 @@
 import { Avatar, Button, Grid, Hidden, makeStyles, Menu, MenuItem } from '@material-ui/core'
-import { AccountCircle, ExitToApp, ExploreOutlined, HomeOutlined, Input, MovieCreationOutlined, PermIdentity, VpnKey } from '@material-ui/icons'
+import { AccountCircle, ExitToApp, ExploreOutlined, Input, MovieCreationOutlined, PermIdentity } from '@material-ui/icons'
 import React, { useState } from 'react'
 import { useContext } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'

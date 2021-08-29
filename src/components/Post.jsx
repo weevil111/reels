@@ -138,7 +138,7 @@ const Post = ({ post }) => {
   const postTimeFormatted = `${postDate.toDateString()} - ${postDate.toLocaleTimeString()}`;
   return user ? (
     <Grid container justifyContent="center" className={classes.container}>
-      <Grid item xs={12} sm={8} lg={4} zeroMinWidth>
+      <Grid item xs={12} sm={8} lg={3} zeroMinWidth>
         <Card>
           <CardHeader
             avatar={
@@ -156,7 +156,7 @@ const Post = ({ post }) => {
             <Typography variant="body1" className={classes.caption}>{post.caption}</Typography>
             <CardMedia>
             {post.type==="image"?(
-              <img src={post.mediaLink} className={classes.imagePost}></img>
+              <img src={post.mediaLink} className={classes.imagePost} alt="Post media"></img>
             ):(
               <div className="video-container">
                 <Video src={post.mediaLink}></Video>
@@ -226,7 +226,8 @@ const Post = ({ post }) => {
 function Video(props) {
 
   const handleAutoScroll = (e) => {
-    let next = ReactDOM.findDOMNode(e.target).parentNode.parentNode.parentNode.parentNode.nextSibling
+    let next = ReactDOM.findDOMNode(e.target).parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.nextSibling;
+    console.log("Next is ",ReactDOM.findDOMNode(e.target))
     if (next) {
       next.scrollIntoView({ behaviour: "smooth" });
       e.target.muted = "true";

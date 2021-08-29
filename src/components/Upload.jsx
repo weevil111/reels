@@ -9,6 +9,7 @@ function Upload({ history }) {
   const [caption, setCaption] = useState("");
   const { currentUser, setNotificationObj } = useContext(AuthContext);
   const [mediaFile, setMediaFile] = useState(null);
+  const [mediaFileType, setMediaFileType] = useState("")
 
   function showErrorNotification(message) {
     setNotificationObj({
@@ -20,24 +21,30 @@ function Upload({ history }) {
     let file = e.target.files[0];
     if (!file) {
       return;
+    }
+
+    let errorMessage = "";
+    const mediaType = file.type.split("/")[0];
+    if (!["video", "image"].includes(mediaType)) {
+      errorMessage = "Unsupported media type.";
     } else if ((file.size / 1024 / 1024) > 10) {
-      showErrorNotification("File too large ( > 10 MB)");
+      errorMessage = "File too large ( > 10 MB)";
+    }
+    if (errorMessage) {
+      showErrorNotification(errorMessage);
       setMediaFile(null);
+      setMediaFileType("");
       e.target.value = "";
       return;
     }
+    setMediaFileType(mediaType);
     setMediaFile(file);
   }
   const handleUploadFile = async () => {
     if (!mediaFile) {
       return;
     }
-    const mediaType = mediaFile.type.split("/")[0];
-    if (!["video", "image"].includes(mediaType)) {
-      showErrorNotification("Unsupported media type.");
-      return;
-    }
-
+    
     if (caption.length > 250) {
       showErrorNotification("Caption length too long ( > 250 characters)")
       return;
@@ -46,7 +53,7 @@ function Upload({ history }) {
     let uid = currentUser.uid;
     try {
       const uploadVideoObject = firebaseStorage
-        .ref(`/media/${uid}/posts/${mediaType}/${Date.now()}.mp4`)
+        .ref(`/media/${uid}/posts/${mediaFileType}/${Date.now()}.mp4`)
         .put(mediaFile);
       uploadVideoObject.on("state_changed", fun1, fun2, fun3);
 
@@ -73,7 +80,7 @@ function Upload({ history }) {
           likes: [],
           mediaLink: mediaUrl,
           caption,
-          type: mediaType,
+          type: mediaFileType,
           createdAt: timestamp()
         });
         let doc = await firebaseDB.collection("users").doc(uid).get();
@@ -118,7 +125,8 @@ function Upload({ history }) {
     singleLineText: {
       overflow: "hidden",
       whiteSpace: "nowrap",
-      textOverflow: "ellipsis"
+      textOverflow: "ellipsis",
+      textAlign: "center"
     },
   })
   const classes = useStyles();
@@ -137,7 +145,7 @@ function Upload({ history }) {
             id="videoInput"
             style={{ display: "none" }}
             onChange={handleInputFile} />
-          <Typography variant="body1" component="div" className={classes.singleLineText}>{mediaFile?.name}</Typography>
+            <Typography variant="body1" component="div" className={classes.singleLineText}>{mediaFile?.name}</Typography>
           <Button
             variant="contained"
             color="secondary"
