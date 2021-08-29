@@ -17,6 +17,9 @@ const Post = ({ post }) => {
   const { currentUser, setNotificationObj } = useContext(AuthContext);
 
   const handleComment = async () => {
+    if(comment.trim() === ""){
+      return;
+    }
     let doc = await firebaseDB.collection("posts").doc(pid).get();
     let oldDocument = doc.data();
     let commentObject = {
@@ -227,7 +230,6 @@ function Video(props) {
 
   const handleAutoScroll = (e) => {
     let next = ReactDOM.findDOMNode(e.target).parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.nextSibling;
-    console.log("Next is ",ReactDOM.findDOMNode(e.target))
     if (next) {
       next.scrollIntoView({ behaviour: "smooth" });
       e.target.muted = "true";
