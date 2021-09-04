@@ -10,7 +10,7 @@ const Feeds = (props) => {
   useEffect(() => {
     let conditionObject = {
       root: null, // Observer from the whole page
-      threshold: "0.6"
+      threshold: "0.7"
     }
     function observerCallback(entries) {
       entries.forEach(entry => {
@@ -24,13 +24,13 @@ const Feeds = (props) => {
         })
       })
     }
-    let observerObject = new IntersectionObserver(observerCallback, conditionObject);
-    let elements = document.querySelectorAll(".video-container");
-
-    elements.forEach(el => {
-      observerObject.observe(el);
-    })
-
+    setTimeout(() => {
+      let observerObject = new IntersectionObserver(observerCallback, conditionObject);
+      let elements = document.querySelectorAll(".video-container");
+      elements.forEach(el => {
+        observerObject.observe(el);
+      })
+    },5000)
   }, [posts])
 
   useEffect(() => {

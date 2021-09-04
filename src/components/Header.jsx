@@ -20,11 +20,14 @@ const Header = () => {
     setAnchorEl(null);
   }
   const useStyles = makeStyles({
+    logoContainer:{
+      display: "flex",
+      justifyContent: "center"
+    },
     img: {
-      margin: "auto",
+      margin: "0 10px",
       display: "block",
-      width: "150px",
-      height: "100%",
+      height: "30px",
     },
     menuOptions: {
       display: "flex",
@@ -54,11 +57,14 @@ const Header = () => {
       className={classes.outerContainer}
     >
       <Grid item xs={2} sm={4}>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/840px-Instagram_logo.svg.png"
+        <div className={classes.logoContainer}>
+        <img src="https://seeklogo.com/images/I/instagram-reels-logo-18CF7D9510-seeklogo.com.png"
           alt="Instagram logo"
           onClick={() => navigate("/")}
           className={classes.img}
         />
+        <h3>Reels</h3>
+        </div>
       </Grid>
       <Grid item xs={4}>
         {currentUserInfo ? (<div className={classes.menuOptions}>

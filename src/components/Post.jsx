@@ -155,7 +155,7 @@ const Post = ({ post }) => {
   const avatarLetter = user ? (user.username ? user.username[0] : user.email[0]) : "😎";
   return user ? (
     <Grid container justifyContent="center" className={classes.container}>
-      <Grid item xs={12} sm={8} lg={4} zeroMinWidth>
+      <Grid item xs={12} sm={6} md={4} zeroMinWidth>
         <Card>
           <CardHeader
             avatar={

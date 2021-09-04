@@ -94,7 +94,7 @@ const Login = (props) => {
         </Hidden>
         <Grid item xs={8} sm={6} md={4}>
           <Card variant="outlined">
-            <CardMedia image="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/840px-Instagram_logo.svg.png" style={{ height: "5rem", backgroundSize: "contain" }}>
+            <CardMedia image="https://seeklogo.com/images/I/instagram-reels-logo-18CF7D9510-seeklogo.com.png" style={{ height: "4rem", backgroundSize: "contain", margin: "8px" }}>
             </CardMedia>
             <CardContent className={classes.cardContent}>
               <TextField
