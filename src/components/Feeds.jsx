@@ -10,7 +10,7 @@ const Feeds = (props) => {
   useEffect(() => {
     let conditionObject = {
       root: null, // Observer from the whole page
-      threshold: "0.7"
+      threshold: "0.6"
     }
     function observerCallback(entries) {
       entries.forEach(entry => {
